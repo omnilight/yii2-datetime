@@ -3,8 +3,12 @@
 namespace omnilight\datetime;
 
 use yii\base\Behavior;
+use yii\base\Event;
+use yii\base\InvalidParamException;
+use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\i18n\Formatter;
+use yii\validators\DateValidator;
 
 
 /**
@@ -23,11 +27,11 @@ class DateTimeBehavior extends Behavior
     /**
      * @var string|array
      */
-    public $originalFormat = 'datetime';
+    public $originalFormat = ['datetime', 'yyyy-MM-dd HH:mm:ss'];
     /**
      * @var string|array
      */
-    public $targetFormat = 'datetime';
+    public $targetFormat = 'date';
     /**
      * @var array
      */
@@ -53,6 +57,32 @@ class DateTimeBehavior extends Behavior
             $this->formatter = \Yii::createObject($this->formatter);
 
         $this->prepareAttributes();
+    }
+
+    public function events()
+    {
+        $events = [];
+        if ($this->performValidation) {
+            $events[BaseActiveRecord::EVENT_BEFORE_VALIDATE] = 'onBeforeValidate';
+        }
+        return $events;
+    }
+
+    /**
+     * Performs validation for all the attributes
+     * @param Event $event
+     */
+    public function onBeforeValidate($event)
+    {
+        foreach ($this->attributeValues as $targetAttribute => $value) {
+            if ($value instanceof DateTimeAttribute) {
+                $validator = \Yii::createObject([
+                    'class' => DateValidator::className(),
+                    'format' => self::normalizeIcuFormat($value->targetFormat, $this->formatter)[1],
+                ]);
+                $validator->validateAttribute($this->owner, $targetAttribute);
+            }
+        }
     }
 
     protected function prepareAttributes()
@@ -142,5 +172,26 @@ class DateTimeBehavior extends Behavior
             $this->attributeValues[$name]->value = $value;
     }
 
-
+    /**
+     * @param string|array $format
+     * @param Formatter $formatter
+     * @throws InvalidParamException
+     * @return array|string
+     */
+    public static function normalizeIcuFormat($format, $formatter)
+    {
+        if (is_string($format)) {
+            switch ($format) {
+                case 'date':
+                    return ['date', $formatter->dateFormat];
+                case 'time':
+                    return ['time', $formatter->timeFormat];
+                case 'datetime':
+                    return ['datetime', $formatter->datetimeFormat];
+                default:
+                    throw new InvalidParamException('$format has incorrect value');
+            }
+        }
+        return $format;
+    }
 } 
