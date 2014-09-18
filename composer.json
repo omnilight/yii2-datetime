@@ -1,0 +1,22 @@
+{
+    "name": "omnilight/yii2-datetime",
+    "description": "Yii2 extension that adds helpers and behaviors for working with date and time",
+    "keywords": ["yii2", "date", "time", "datetime"],
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Pavel Agalecky",
+            "email": "pavel.agalecky@gmail.com"
+        }
+    ],
+    "type": "yii2-extension",
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "omnilight\\datetime\\": ""
+        }
+    }
+}
