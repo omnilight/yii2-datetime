@@ -76,6 +76,7 @@ Now in your view with the form:
 ```php
 // $model has instance of Post
 <?= $form->field($model, 'posted_at_local')->widget(\yii\jui\DatePicker::className(), \omnilight\datetime\DatePickerConfig::get($model->posted_at_local)) ?>
+// DatePickerConfig is used to properly configure widget. Currently it only supports DatePicker from the Jui extension
 ```
 
 That's all! User will enter date in the his local format and will be converted to the database automatically.
