@@ -42,10 +42,14 @@ class DateTimeAttribute extends Object
      */
     public function getValue()
     {
-        if ($this->_value)
-            return $this->_value;
-        else
-            return $this->behavior->formatter->format($this->behavior->owner->{$this->originalAttribute}, $this->targetFormat);
+        try {
+            if ($this->_value)
+                return $this->_value;
+            else
+                return $this->behavior->formatter->format($this->behavior->owner->{$this->originalAttribute}, $this->targetFormat);
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     /**
