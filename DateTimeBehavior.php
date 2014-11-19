@@ -33,6 +33,10 @@ class DateTimeBehavior extends Behavior
      */
     public $targetFormat = 'date';
     /**
+     * @var string Value in the target format that will be displayed when original value is null
+     */
+    public $nullValue = '';
+    /**
      * @var array List of the model attributes in one of the following formats:
      * ```php
      *  [
@@ -101,6 +105,7 @@ class DateTimeBehavior extends Behavior
             $config = $this->attributeConfig;
             $config['originalFormat'] = $this->originalFormat;
             $config['targetFormat'] = $this->targetFormat;
+            $config['nullValue'] = $this->nullValue;
             if (is_integer($key)) {
                 $originalAttribute = $value;
                 $targetAttribute = $this->processTemplate($originalAttribute);

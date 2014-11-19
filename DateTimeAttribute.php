@@ -30,6 +30,10 @@ class DateTimeAttribute extends Object
     /**
      * @var string
      */
+    public $nullValue;
+    /**
+     * @var string
+     */
     protected $_value;
 
     function __toString()
@@ -45,10 +49,15 @@ class DateTimeAttribute extends Object
         try {
             if ($this->_value)
                 return $this->_value;
-            else
-                return $this->behavior->formatter->format($this->behavior->owner->{$this->originalAttribute}, $this->targetFormat);
+            else {
+                $originalValue = $this->behavior->owner->{$this->originalAttribute};
+                if ($originalValue === null)
+                    return $this->nullValue;
+                else
+                    return $this->behavior->formatter->format($originalValue, $this->targetFormat);
+            }
         } catch (\Exception $e) {
-            return '';
+            return $this->nullValue;
         }
     }
 
