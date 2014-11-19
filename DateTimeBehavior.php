@@ -25,15 +25,25 @@ class DateTimeBehavior extends Behavior
      */
     public $formatter;
     /**
-     * @var string|array
+     * @var string|array Format of the attributes in the database
      */
     public $originalFormat = ['datetime', 'yyyy-MM-dd HH:mm:ss'];
     /**
-     * @var string|array
+     * @var string|array Format of the attribute that should be shown to the user
      */
     public $targetFormat = 'date';
     /**
-     * @var array
+     * @var array List of the model attributes in one of the following formats:
+     * ```php
+     *  [
+     *      'first', // This will use default configuration and virtual attribute template
+     *      'second' => 'target_second', // This will use default configuration with custom attribute template
+     *      'third' => [
+     *          'targetAttribute' => 'target_third', // Optional
+     *          // Rest of configuration
+     *      ]
+     *  ]
+     * ```
      */
     public $attributes = [];
     /**
@@ -191,6 +201,8 @@ class DateTimeBehavior extends Behavior
                 default:
                     throw new InvalidParamException('$format has incorrect value');
             }
+        } elseif (is_array($format) && count($format) < 2) {
+            throw new InvalidParamException('When $format is presented in array form, it must have at least two elements');
         }
         return $format;
     }
