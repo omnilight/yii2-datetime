@@ -162,8 +162,10 @@ class DateTimeBehavior extends Behavior
 
     public function __set($name, $value)
     {
-        if ($this->hasAttributeValue($name))
+        if ($this->hasAttributeValue($name)) {
             $this->setAttributeValue($name, $value);
+            return;
+        }
         parent::__set($name, $value);
     }
 
