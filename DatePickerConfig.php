@@ -28,6 +28,10 @@ class DatePickerConfig
                         'dateFormat' => FormatConverter::convertDateIcuToJui($format[1], $format[0]),
                     ]
                 ];
+            case 'omnilight\widgets\DateRangePicker':
+                return [
+                    'dateFormat' => $format[1],
+                ];
             default:
                 return [];
         }
