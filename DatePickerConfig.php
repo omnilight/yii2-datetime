@@ -3,6 +3,7 @@
 namespace omnilight\datetime;
 
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FormatConverter;
 use yii\i18n\Formatter;
 
@@ -14,26 +15,25 @@ class DatePickerConfig
 {
     /**
      * @param DateTimeAttribute $attribute
+     * @param array $options
      * @param string $datePickerClass
      * @return array
      */
-    public static function get($attribute, $datePickerClass = 'yii\jui\DatePicker')
+    public static function get(DateTimeAttribute $attribute, $options = [], $datePickerClass = 'yii\jui\DatePicker')
     {
         $format = DateTimeBehavior::normalizeIcuFormat($attribute->targetFormat, $attribute->behavior->formatter);
         switch ($datePickerClass) {
             case 'yii\jui\DatePicker':
-                return [
+                $defaults = [
                     'language' => \Yii::$app->language,
                     'clientOptions' => [
-                        'dateFormat' => FormatConverter::convertDateIcuToJui($format[1], $format[0]),
+                        'dateFormat' => 'php://'.FormatConverter::convertDateIcuToJui($format[1], $format[0]),
                     ]
                 ];
-            case 'omnilight\widgets\DateRangePicker':
-                return [
-                    'dateFormat' => $format[1],
-                ];
+                break;
             default:
-                return [];
+                return $options;
         }
+        return ArrayHelper::merge($defaults, $options);
     }
 }
