@@ -3,6 +3,7 @@
 namespace omnilight\datetime;
 
 use yii\base\Object;
+use yii\helpers\FormatConverter;
 
 
 /**
@@ -67,6 +68,9 @@ class DateTimeAttribute extends Object
     public function setValue($value)
     {
         $this->_value = $value;
-        $this->behavior->owner->{$this->originalAttribute} = $this->behavior->formatter->format($this->_value, $this->originalFormat);
+        $normalizedFormat = DateTimeBehavior::normalizeIcuFormat($this->targetFormat, $this->behavior->formatter);
+        $phpFormat = FormatConverter::convertDateIcuToPhp($normalizedFormat[1], $normalizedFormat[0], \Yii::$app->language);
+        $value = date_create_from_format($phpFormat, $value);
+        $this->behavior->owner->{$this->originalAttribute} = $this->behavior->formatter->format($value, $this->originalFormat);
     }
 }

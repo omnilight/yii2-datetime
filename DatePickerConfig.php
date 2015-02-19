@@ -2,10 +2,8 @@
 
 namespace omnilight\datetime;
 
-use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FormatConverter;
-use yii\i18n\Formatter;
 
 
 /**
@@ -27,8 +25,14 @@ class DatePickerConfig
                 $defaults = [
                     'language' => \Yii::$app->language,
                     'clientOptions' => [
-                        'dateFormat' => 'php://'.FormatConverter::convertDateIcuToJui($format[1], $format[0]),
+                        'dateFormat' => 'php:' . FormatConverter::convertDateIcuToJui($format[1], $format[0]),
                     ]
+                ];
+                break;
+            case 'omnilight\widgets\DatePicker':
+                $defaults = [
+                    'language' => \Yii::$app->language,
+                    'dateFormat' => 'php:' . FormatConverter::convertDateIcuToPhp($format[1], $format[0]),
                 ];
                 break;
             default:
