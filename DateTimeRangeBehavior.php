@@ -30,10 +30,6 @@ class DateTimeRangeBehavior extends Behavior
      */
     public $separator = ' - ';
     /**
-     * @var bool
-     */
-    public $performValidation = true;
-    /**
      * @var string Defines name of the target attribute. {start} and {end} placeholders can be used.
      * After behaviour initialization this name will be replaced with real name of the target attribute
      */
@@ -58,31 +54,14 @@ class DateTimeRangeBehavior extends Behavior
         ]);
     }
 
-
-    public function events()
-    {
-        $events = [];
-        if ($this->performValidation) {
-            $events[BaseActiveRecord::EVENT_BEFORE_VALIDATE] = 'onBeforeValidate';
-        }
-        return $events;
-    }
-
     /**
-     * Performs validation for all the attributes
-     * @param Event $event
+     * @param string $value
+     * @return bool
      */
-    public function onBeforeValidate($event)
+    public function validateValue($value)
     {
-        foreach ($this->attributeValues as $targetAttribute => $value) {
-            if ($value instanceof DateTimeAttribute) {
-                $validator = \Yii::createObject([
-                    'class' => DateValidator::className(),
-                    'format' => self::normalizeIcuFormat($value->targetFormat, $this->formatter)[1],
-                ]);
-                $validator->validateAttribute($this->owner, $targetAttribute);
-            }
-        }
+        $separator = preg_quote($this->separator, '/');
+        return preg_match("/^.+{$separator}.+$/", $value) === 1;
     }
 
     public function canSetProperty($name, $checkVars = true)
@@ -111,7 +90,7 @@ class DateTimeRangeBehavior extends Behavior
     public function __set($name, $value)
     {
         if ($name === $this->targetAttribute) {
-            $this->setAttributeValue($name, $value);
+            $this->setAttributeValue($value);
             return;
         }
         parent::__set($name, $value);
@@ -122,7 +101,7 @@ class DateTimeRangeBehavior extends Behavior
         if ($this->_value) {
             return $this->_value;
         }
-        return $this->owner->{$this->startAttribute} . $this->separator . $this->owner->{$this->endAttribute};
+        return (string)$this->owner->{$this->startAttribute} . $this->separator . (string)$this->owner->{$this->endAttribute};
     }
 
     public function setAttributeValue($value)
@@ -134,15 +113,5 @@ class DateTimeRangeBehavior extends Behavior
             $this->owner->{$this->startAttribute} = $start;
             $this->owner->{$this->endAttribute} = $end;
         }
-    }
-
-    /**
-     * @param string $value
-     * @return int
-     */
-    protected function validateValue($value)
-    {
-        $separator = preg_quote($this->separator, '/');
-        return preg_match("/^.+{$separator}.+$/", $value) === 1;
     }
 }
