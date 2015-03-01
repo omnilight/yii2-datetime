@@ -16,10 +16,6 @@ class DateTimeRangeBehavior extends Behavior
     /**
      * @var string
      */
-    public $namingTemplate = '{start}_{end}_range';
-    /**
-     * @var string
-     */
     public $startAttribute;
     /**
      * @var string
