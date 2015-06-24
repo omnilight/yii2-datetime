@@ -73,32 +73,6 @@ class DateTimeBehavior extends Behavior
         $this->prepareAttributes();
     }
 
-    public function events()
-    {
-        $events = [];
-        if ($this->performValidation) {
-            $events[BaseActiveRecord::EVENT_BEFORE_VALIDATE] = 'onBeforeValidate';
-        }
-        return $events;
-    }
-
-    /**
-     * Performs validation for all the attributes
-     * @param Event $event
-     */
-    public function onBeforeValidate($event)
-    {
-        foreach ($this->attributeValues as $targetAttribute => $value) {
-            if ($value instanceof DateTimeAttribute) {
-                $validator = \Yii::createObject([
-                    'class' => DateValidator::className(),
-                    'format' => self::normalizeIcuFormat($value->targetFormat, $this->formatter)[1],
-                ]);
-                $validator->validateAttribute($this->owner, $targetAttribute);
-            }
-        }
-    }
-
     protected function prepareAttributes()
     {
         foreach ($this->attributes as $key => $value) {
@@ -132,61 +106,30 @@ class DateTimeBehavior extends Behavior
         ]);
     }
 
-    public function canGetProperty($name, $checkVars = true)
+    public function events()
     {
-        if ($this->hasAttributeValue($name))
-            return true;
-        else
-            return parent::canGetProperty($name, $checkVars);
-    }
-
-    protected function hasAttributeValue($name)
-    {
-        return isset($this->attributeValues[$name]);
-    }
-
-    public function canSetProperty($name, $checkVars = true)
-    {
-        if ($this->hasAttributeValue($name))
-            return true;
-        else
-            return parent::canSetProperty($name, $checkVars);
-    }
-
-    public function __get($name)
-    {
-        if ($this->hasAttributeValue($name))
-            return $this->getAttributeValue($name);
-        return parent::__get($name);
-    }
-
-    public function __set($name, $value)
-    {
-        if ($this->hasAttributeValue($name)) {
-            $this->setAttributeValue($name, $value);
-            return;
+        $events = [];
+        if ($this->performValidation) {
+            $events[BaseActiveRecord::EVENT_BEFORE_VALIDATE] = 'onBeforeValidate';
         }
-        parent::__set($name, $value);
+        return $events;
     }
 
-    protected function getAttributeValue($name)
+    /**
+     * Performs validation for all the attributes
+     * @param Event $event
+     */
+    public function onBeforeValidate($event)
     {
-        if (is_array($this->attributeValues[$name])) {
-            $this->attributeValues[$name] = \Yii::createObject($this->attributeValues[$name]);
+        foreach ($this->attributeValues as $targetAttribute => $value) {
+            if ($value instanceof DateTimeAttribute) {
+                $validator = \Yii::createObject([
+                    'class' => DateValidator::className(),
+                    'format' => self::normalizeIcuFormat($value->targetFormat, $this->formatter)[1],
+                ]);
+                $validator->validateAttribute($this->owner, $targetAttribute);
+            }
         }
-        return $this->attributeValues[$name];
-    }
-
-    protected function setAttributeValue($name, $value)
-    {
-        if (is_array($this->attributeValues[$name])) {
-            $this->attributeValues[$name] = \Yii::createObject($this->attributeValues[$name]);
-        }
-
-        if ($value instanceof DateTimeAttribute)
-            $this->attributeValues[$name] = $value;
-        else
-            $this->attributeValues[$name]->value = $value;
     }
 
     /**
@@ -212,5 +155,55 @@ class DateTimeBehavior extends Behavior
             throw new InvalidParamException('When $format is presented in array form, it must have at least two elements');
         }
         return $format;
+    }
+
+    public function canGetProperty($name, $checkVars = true)
+    {
+        if ($this->hasAttribute($name)) {
+            return true;
+        }
+
+        return parent::canGetProperty($name, $checkVars);
+    }
+
+    public function hasAttribute($name)
+    {
+        return isset($this->attributeValues[$name]);
+    }
+
+    public function canSetProperty($name, $checkVars = true)
+    {
+        if ($this->hasAttribute($name)) {
+            return true;
+        }
+
+        return parent::canSetProperty($name, $checkVars);
+    }
+
+    public function __get($name)
+    {
+        if ($this->hasAttribute($name)) {
+            return $this->getAttribute($name)->getValue();
+        }
+
+        return parent::__get($name);
+    }
+
+    public function __set($name, $value)
+    {
+        if ($this->hasAttribute($name)) {
+            $this->getAttribute($name)->setValue($value);
+            return;
+        }
+
+        parent::__set($name, $value);
+    }
+
+    public function getAttribute($name)
+    {
+        if (is_array($this->attributeValues[$name])) {
+            $this->attributeValues[$name] = \Yii::createObject($this->attributeValues[$name]);
+        }
+        return $this->attributeValues[$name];
     }
 } 
