@@ -76,7 +76,7 @@ class DateTimeAttribute extends Object
         $this->_value = $value;
         $normalizedFormat = DateTimeBehavior::normalizeIcuFormat($this->targetFormat, $this->behavior->formatter);
         $phpFormat = FormatConverter::convertDateIcuToPhp($normalizedFormat[1], $normalizedFormat[0], \Yii::$app->language);
-        $value = date_create_from_format($phpFormat, $value);
-        $this->behavior->owner->{$this->originalAttribute} = $this->behavior->formatter->format($value, $this->originalFormat);
+        $dateTime = date_create_from_format($phpFormat, $value);
+        $this->behavior->owner->{$this->originalAttribute} = $this->behavior->formatter->format($dateTime, $this->originalFormat);
     }
 }

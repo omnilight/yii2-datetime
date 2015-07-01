@@ -1,6 +1,9 @@
 <?php
 
 namespace omnilight\datetime;
+use omnilight\widgets\DateRangePicker;
+use yii\base\InvalidParamException;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FormatConverter;
 
@@ -10,22 +13,31 @@ use yii\helpers\FormatConverter;
  */
 class DateRangeConfig 
 {
+    use DateTimeAttributeFinder, DateTimeRangeBehaviorFinder;
+
     /**
-     * @param DateTimeRangeBehavior $behavior
+     * @param Model $model
+     * @param string $attribute
      * @param array $options
      * @param string $datePickerClass
      * @return array
      */
-    public static function get(DateTimeRangeBehavior $behavior, $options = [], $datePickerClass = 'omnilight\widgets\DateRangePicker')
+    public static function get(Model $model, $attribute, $options = [], $datePickerClass = DateRangePicker::class)
     {
-        $startAttribute = $behavior->owner->{$behavior->startAttribute};
-        $endAttribute = $behavior->owner->{$behavior->startAttribute};
-        $formatAttribute = ($startAttribute instanceof DateTimeAttribute) ? $startAttribute :
-            (($endAttribute instanceof DateTimeAttribute) ? $endAttribute : null);
+        $behavior = self::findBehavior($model, $attribute);
+
+        $formatAttribute = null;
+
+        try {
+            $formatAttribute = self::findAttribute($model, $behavior->startAttribute);
+            $formatAttribute = self::findAttribute($model, $behavior->endAttribute);
+        } catch (InvalidParamException $e) {
+
+        }
 
         $defaults = [];
         switch ($datePickerClass) {
-            case 'omnilight\widgets\DateRangePicker':
+            case DateRangePicker::class:
                 $defaults = [
                     'separator' => $behavior->separator,
                 ];

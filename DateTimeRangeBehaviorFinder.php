@@ -1,28 +1,35 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: Павел
+ * Date: 01.07.2015
+ * Time: 18:33
+ */
+
 namespace omnilight\datetime;
-use yii\base\Model;
 use yii\base\InvalidParamException;
+use yii\base\Model;
 
 
 /**
- * Trait AttributeFinder
+ * Trait DateTimeRangeBehaviorFinder
  */
-trait AttributeFinder
+trait DateTimeRangeBehaviorFinder
 {
     /**
      * @param Model $model
      * @param $attribute
-     * @return DateTimeAttribute
+     * @return DateTimeRangeBehavior
      */
-    protected static function findAttribute(Model $model, $attribute)
+    protected static function findBehavior(Model $model, $attribute)
     {
         foreach ($model->behaviors as $behavior) {
-            if (!($behavior instanceof DateTimeBehavior)) {
+            if (!($behavior instanceof DateTimeRangeBehavior)) {
                 continue;
             }
 
             if ($behavior->hasAttribute($attribute)) {
-                return $behavior->getAttribute($attribute);
+                return $behavior;
             }
         }
 

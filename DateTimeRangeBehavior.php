@@ -3,9 +3,7 @@
 namespace omnilight\datetime;
 
 use yii\base\Behavior;
-use yii\base\Event;
 use yii\base\InvalidConfigException;
-use yii\db\BaseActiveRecord;
 
 
 /**
@@ -50,49 +48,45 @@ class DateTimeRangeBehavior extends Behavior
         ]);
     }
 
-    /**
-     * @param string $value
-     * @return bool
-     */
-    public function validateValue($value)
-    {
-        $separator = preg_quote($this->separator, '/');
-        return preg_match("/^.+{$separator}.+$/", $value) === 1;
-    }
-
     public function canSetProperty($name, $checkVars = true)
     {
-        if ($name === $this->targetAttribute)
+        if ($this->hasAttribute($name)) {
             return true;
-        else
-            return parent::canSetProperty($name, $checkVars);
+        }
+        return parent::canSetProperty($name, $checkVars);
+    }
+
+    public function hasAttribute($attribute)
+    {
+        return $attribute === $this->targetAttribute;
     }
 
     public function canGetProperty($name, $checkVars = true)
     {
-        if ($name === $this->targetAttribute)
+        if ($this->hasAttribute($name)) {
             return true;
-        else
-            return parent::canGetProperty($name, $checkVars);
+        }
+        return parent::canGetProperty($name, $checkVars);
     }
 
     public function __get($name)
     {
-        if ($name === $this->targetAttribute)
-            return $this->getAttributeValue($name);
+        if ($this->hasAttribute($name)) {
+            return $this->getAttribute($name);
+        }
         return parent::__get($name);
     }
 
     public function __set($name, $value)
     {
-        if ($name === $this->targetAttribute) {
-            $this->setAttributeValue($value);
+        if ($this->hasAttribute($name)) {
+            $this->setAttribute($value);
             return;
         }
         parent::__set($name, $value);
     }
 
-    public function getAttributeValue($name)
+    public function getAttribute($name)
     {
         if ($this->_value) {
             return $this->_value;
@@ -100,7 +94,7 @@ class DateTimeRangeBehavior extends Behavior
         return (string)$this->owner->{$this->startAttribute} . $this->separator . (string)$this->owner->{$this->endAttribute};
     }
 
-    public function setAttributeValue($value)
+    public function setAttribute($value)
     {
         $this->_value = $value;
         if ($this->validateValue($value)) {
@@ -109,5 +103,15 @@ class DateTimeRangeBehavior extends Behavior
             $this->owner->{$this->startAttribute} = $start;
             $this->owner->{$this->endAttribute} = $end;
         }
+    }
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function validateValue($value)
+    {
+        $separator = preg_quote($this->separator, '/');
+        return preg_match("/^.+{$separator}.+$/", $value) === 1;
     }
 }
