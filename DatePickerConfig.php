@@ -2,7 +2,6 @@
 
 namespace omnilight\datetime;
 
-use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -47,7 +46,7 @@ class DatePickerConfig
                 default:
                     return $options;
             }
-        } catch (InvalidConfigException $e) {
+        } catch (InvalidParamException $e) {
             $defaults = [];
         }
         return ArrayHelper::merge($defaults, $options);
