@@ -7,6 +7,7 @@ use yii\base\Event;
 use yii\base\InvalidParamException;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FormatConverter;
 use yii\i18n\Formatter;
 use yii\validators\DateValidator;
 
@@ -143,11 +144,23 @@ class DateTimeBehavior extends Behavior
         if (is_string($format)) {
             switch ($format) {
                 case 'date':
-                    return ['date', $formatter->dateFormat];
+                    $format = $formatter->dateFormat;
+                    if (strncmp($format, 'php:', 4) === 0) {
+                        $format = FormatConverter::convertDatePhpToIcu(substr($format, 4));
+                    }
+                    return ['date', $format];
                 case 'time':
-                    return ['time', $formatter->timeFormat];
+                    $format = $formatter->timeFormat;
+                    if (strncmp($format, 'php:', 4) === 0) {
+                        $format = FormatConverter::convertDatePhpToIcu(substr($format, 4));
+                    }
+                    return ['time', $format];
                 case 'datetime':
-                    return ['datetime', $formatter->datetimeFormat];
+                    $format = $formatter->datetimeFormat;
+                    if (strncmp($format, 'php:', 4) === 0) {
+                        $format = FormatConverter::convertDatePhpToIcu(substr($format, 4));
+                    }
+                    return ['datetime', $format];
                 default:
                     throw new InvalidParamException('$format has incorrect value');
             }
