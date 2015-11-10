@@ -54,9 +54,9 @@ class DateTimeAttribute extends Object
     public function getValue()
     {
         try {
-            if ($this->_value)
+            if ($this->_value !== null) {
                 return $this->_value;
-            else {
+            } else {
                 $originalValue = $this->behavior->owner->{$this->originalAttribute};
                 if ($originalValue === null)
                     return $this->nullValue;
