@@ -1,6 +1,6 @@
 <?php
 
-namespace omnilight\datetime;
+namespace n1c01a5\datetime;
 
 use yii\base\InvalidParamException;
 use yii\base\Model;
